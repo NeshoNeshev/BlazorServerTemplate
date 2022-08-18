@@ -15,4 +15,9 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.8" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Data\BlazorServerTemplate.Data\BlazorServerTemplate.Data.csproj" />
+    <ProjectReference Include="..\Services\BlazorServerTemplate.Services.Messaging\BlazorServerTemplate.Services.Messaging.csproj" />
+  </ItemGroup>
+
 </Project>

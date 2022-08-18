@@ -1,10 +1,9 @@
 using BlazorServerTemplate.Areas.Identity;
 using BlazorServerTemplate.Data;
-using Microsoft.AspNetCore.Components;
+using BlazorServerTemplate.Data.Repositories;
+using BlazorServerTemplate.Services.Messaging;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +19,16 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 builder.Services.AddSingleton<WeatherForecastService>();
+
+// Data repositories
+builder.Services.AddScoped(typeof(IDeletableEntityRepository<>), typeof(EfDeletableEntityRepository<>));
+builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+builder.Services.AddScoped<IDbQueryRunner, DbQueryRunner>();
+
+//SendGrid
+builder.Services.AddTransient<IEmailSender, NullMessageSender>();
+builder.Services.AddTransient<IEmailSender>(
+                serviceProvider => new SendGridEmailSender(builder.Configuration["SendGrid:ApiKey"]));
 
 var app = builder.Build();
 
