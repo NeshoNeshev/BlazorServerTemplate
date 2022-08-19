@@ -1,10 +1,16 @@
+using BlazorServerTemplate;
 using BlazorServerTemplate.Areas.Identity;
 using BlazorServerTemplate.Data;
+using BlazorServerTemplate.Data.ApplicationModels;
 using BlazorServerTemplate.Data.Repositories;
+using BlazorServerTemplate.Data.Seeding;
+using BlazorServerTemplate.Services.Mapping;
 using BlazorServerTemplate.Services.Messaging;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Radzen;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,24 +19,41 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<ApplicationUser>(IdentityOptionsProvider.GetIdentityOptions).AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
+builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<ApplicationUser>>();
 builder.Services.AddSingleton<WeatherForecastService>();
 
 // Data repositories
 builder.Services.AddScoped(typeof(IDeletableEntityRepository<>), typeof(EfDeletableEntityRepository<>));
 builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
 builder.Services.AddScoped<IDbQueryRunner, DbQueryRunner>();
-
+//Radzen
+builder.Services.AddScoped<DialogService>();
+builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<TooltipService>();
+builder.Services.AddScoped<ContextMenuService>();
 //SendGrid
 builder.Services.AddTransient<IEmailSender, NullMessageSender>();
 builder.Services.AddTransient<IEmailSender>(
                 serviceProvider => new SendGridEmailSender(builder.Configuration["SendGrid:ApiKey"]));
 
 var app = builder.Build();
+
+using (var serviceScope = app.Services.CreateScope())
+{
+    AutoMapperConfiguration.RegisterMappings(typeof(ErrorViewModel).GetTypeInfo().Assembly);
+    IServiceProvider serviceProvider = serviceScope.ServiceProvider;
+    var dbContext = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    dbContext.Database.Migrate();
+    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    new ApplicationSeeder().SeedAsync(dbContext, serviceProvider).GetAwaiter().GetResult();
+
+}
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

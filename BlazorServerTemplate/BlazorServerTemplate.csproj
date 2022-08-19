@@ -13,10 +13,12 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.8" />
+    <PackageReference Include="Radzen.Blazor" Version="3.20.4" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Data\BlazorServerTemplate.Data\BlazorServerTemplate.Data.csproj" />
+    <ProjectReference Include="..\Services\BlazorServerTemplate.Services.Mapping\BlazorServerTemplate.Services.Mapping.csproj" />
     <ProjectReference Include="..\Services\BlazorServerTemplate.Services.Messaging\BlazorServerTemplate.Services.Messaging.csproj" />
   </ItemGroup>
 

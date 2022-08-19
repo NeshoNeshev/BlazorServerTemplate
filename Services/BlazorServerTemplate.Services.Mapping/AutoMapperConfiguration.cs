@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.Configuration;
 using System.Reflection;
 
 namespace BlazorServerTemplate.Services.Mapping
