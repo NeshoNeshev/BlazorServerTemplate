@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\BlazorServerTemplate.Common\BlazorServerTemplate.Common.csproj" />
     <ProjectReference Include="..\BlazorServerTemplate.Data.Models\BlazorServerTemplate.Data.Models.csproj" />
   </ItemGroup>
 

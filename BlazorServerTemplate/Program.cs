@@ -19,7 +19,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-builder.Services.AddDefaultIdentity<ApplicationUser>(IdentityOptionsProvider.GetIdentityOptions).AddRoles<IdentityRole>()
+builder.Services.AddDefaultIdentity<ApplicationUser>(IdentityOptionsProvider.GetIdentityOptions).AddRoles<ApplicationRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
@@ -48,8 +48,10 @@ using (var serviceScope = app.Services.CreateScope())
     IServiceProvider serviceProvider = serviceScope.ServiceProvider;
     var dbContext = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     dbContext.Database.Migrate();
-    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var roleManager = serviceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
     var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    //ApplicationDbInitialiser.SeedRoles(roleManager);
+    //ApplicationDbInitialiser.SeedUsers(userManager);
     new ApplicationSeeder().SeedAsync(dbContext, serviceProvider).GetAwaiter().GetResult();
 
 }
